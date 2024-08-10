@@ -108,7 +108,6 @@ const CourseDescription = ({ user }) => {
       toast.error(error.response.data.message);
       setLoading(false);
     }
-  }
   };
 
   return (
