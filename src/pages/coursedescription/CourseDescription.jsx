@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./coursedescription.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { CourseData } from "../../context/CourseContext";
 import { server } from "../../main";
 import axios from "axios";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 import { UserData } from "../../context/UserContext";
 import Loading from "../../components/loading/Loading";
 
@@ -26,17 +26,17 @@ const CourseDescription = ({ user }) => {
     const token = localStorage.getItem("token");
     setLoading(true);
 
-    const {
-      data: { order },
-    } = await axios.post(
-      `${server}/api/course/checkout/${params.id}`,
-      {},
-      {
-        headers: {
-          token,
-        },
-      }
-    );
+    // const {
+    //   data: { order },
+    // } = await axios.post(
+    //   `${server}/api/course/checkout/${params.id}`,
+    //   {},
+    //   {
+    //     headers: {
+    //       token,
+    //     },
+    //   }
+    // );
 
     // const options = {
     //   key: "rzp_test_yOMeMyaj2wlvTt", // Enter the Key ID generated from the Dashboard
@@ -83,13 +83,44 @@ const CourseDescription = ({ user }) => {
     // const razorpay = new window.Razorpay(options);
 
     // razorpay.open();
+    function generateRandomString(length) {
+      const characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      let result = "";
+      for (let i = 0; i < length; i++) {
+        result += characters.charAt(
+          Math.floor(Math.random() * characters.length)
+        );
+      }
+      return result;
+    }
+    const razorpay_order_id = generateRandomString(3);
+    const razorpay_payment_id = generateRandomString(5);
+    const razorpay_signature = generateRandomString(10);
+
     try {
+      await axios.post(
+        `${server}/api/verification/${params.id}`,
+        {
+          razorpay_order_id,
+          razorpay_payment_id,
+          razorpay_signature,
+        },
+        {
+          headers: {
+            token,
+          },
+        }
+      );
+
       await fetchUser();
       await fetchCourses();
       await fetchMyCourse();
+      // toast.success(data.message);
       setLoading(false);
       navigate(`/payment-success/${razorpay_payment_id}`);
     } catch (error) {
+      // toast.error(error.response.data.message);
       setLoading(false);
     }
   };
